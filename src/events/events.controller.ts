@@ -27,6 +27,12 @@ export class EventsController {
     return this.eventsService.findOne(id);
   }
 
+  // ✅ NEW: recommendations
+  @Get(':id/recommendations')
+  getRecommendations(@Param('id', ParseIntPipe) id: number): Promise<Event[]> {
+    return this.eventsService.getRecommendations(id);
+  }
+
   @Post()
   createEvent(@Body() body: CreateEventDto): Promise<Event> {
     return this.eventsService.create(body);

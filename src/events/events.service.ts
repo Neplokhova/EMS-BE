@@ -46,4 +46,24 @@ export class EventsService {
     await this.repo.remove(event);
     return { deleted: true };
   }
+
+  async getRecommendations(eventId: number): Promise<Event[]> {
+    const baseEvent = await this.findOne(eventId);
+
+    // беремо події +/- 30 днів від дати базової
+    const from = new Date(baseEvent.date);
+    from.setDate(from.getDate() - 30);
+
+    const to = new Date(baseEvent.date);
+    to.setDate(to.getDate() + 30);
+
+    return this.repo
+      .createQueryBuilder('event')
+      .where('event.id != :id', { id: eventId })
+      .andWhere('event.date BETWEEN :from AND :to', { from, to })
+      .orderBy('ABS(EXTRACT(EPOCH FROM (event.date - :baseDate)))', 'ASC')
+      .setParameter('baseDate', baseEvent.date)
+      .limit(5)
+      .getMany();
+  }
 }
