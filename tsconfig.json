@@ -21,11 +21,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
   "exclude": [
     "node_modules",
-    "dist",
-    "test",
-    "**/*.spec.ts",
-    "**/*.e2e-spec.ts"
+    "dist"
   ]
 }

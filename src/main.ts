@@ -8,7 +8,19 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import type { Request, Response, NextFunction } from 'express';
 
 async function bootstrap(): Promise<void> {
+<<<<<<< HEAD
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+=======
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  });
+
+>>>>>>> c130507 (fix part)
   app.useGlobalFilters(new AllExceptionsFilter());
 
   const origin = 'http://localhost:3000';
@@ -57,6 +69,7 @@ async function bootstrap(): Promise<void> {
   const port = portRaw ? Number.parseInt(portRaw, 10) : 5000;
 
   await app.listen(port);
+
   console.log(`🚀 Server running on http://localhost:${port}`);
   console.log(`✅ CORS enabled for ${origin}`);
   console.log(`📘 Swagger available at http://localhost:${port}/api`);
