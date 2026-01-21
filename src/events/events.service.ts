@@ -107,7 +107,6 @@ export class EventsService {
     const to = new Date(base.date);
     to.setDate(to.getDate() + windowDays);
 
-    // 1) primary candidates: same category within date window
     let candidates = await this.repo
       .createQueryBuilder('e')
       .where('e.id != :id', { id: base.id })
@@ -115,7 +114,6 @@ export class EventsService {
       .andWhere('e.date BETWEEN :from AND :to', { from, to })
       .getMany();
 
-    // 2) fallback: if мало кандидатів — додаємо по локації (ширше вікно)
     if (candidates.length < safeLimit) {
       const widerDays = 120;
       const from2 = new Date(base.date);
@@ -131,7 +129,6 @@ export class EventsService {
         .andWhere('e.date BETWEEN :from AND :to', { from: from2, to: to2 })
         .getMany();
 
-      // merge unique by id
       const map = new Map<number, Event>();
       for (const e of candidates) map.set(e.id, e);
       for (const e of more) map.set(e.id, e);
@@ -145,15 +142,12 @@ export class EventsService {
       .map((e) => {
         let score = 0;
 
-        // category match (в primary кандидатах вже матч, але у fallback може бути не так)
         if (e.category === base.category) score += 60;
 
-        // location match / partial
         const loc = (e.location ?? '').toLowerCase();
         if (loc === baseLoc) score += 25;
         else if (loc.includes(baseLoc) || baseLoc.includes(loc)) score += 12;
 
-        // date closeness (чим ближче - тим краще)
         const diffDays =
           Math.abs(e.date.getTime() - baseDate) / (1000 * 60 * 60 * 24);
         score += Math.max(0, 40 - diffDays); // бонус до 40 балів у межах 40 днів
