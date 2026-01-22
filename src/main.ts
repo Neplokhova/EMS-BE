@@ -10,13 +10,6 @@ import type { Request, Response, NextFunction } from 'express';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.enableCors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  });
-  app.useGlobalFilters(new AllExceptionsFilter());
 
   const origin = 'http://localhost:3000';
 
@@ -26,8 +19,12 @@ async function bootstrap(): Promise<void> {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     maxAge: 86400,
+    credentials: true,
   });
 
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+  
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.method === 'OPTIONS') {
       res.header('Access-Control-Allow-Origin', origin);
